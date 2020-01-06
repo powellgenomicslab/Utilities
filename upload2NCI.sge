@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# SGE OPTIONS
+#$ -V
+#$ -cwd
+#$ -b n
+#$ -l fast_dm=10
+#$ -q short.q
+#$ -S /bin/bash
+#$ -N netcp
+
+# CHANGE THIS FOR YOUR OWN ACCOUNT AS RSYNC REQUIRES THE ADDRESS AND NOT AN ALIAS
+LOGIN=as8574@r-dm1.nci.org.au
+
+# Filepath for single file upload
+INPUT_PATH=$1
+INPUT_FILE=$( basename $INPUT_PATH )
+OUTPUT_PATH=$2
+
+# DESTINATION PATH ON NCI
+GDATA_PATH=/g/data1a/ei56
+
+# Check if OUTPUT_PATH starts with GDATA_PATH, otherwise append to OUTPUT_PATH
+if [[ $GDATA_PATH != ${OUTPUT_PATH}/* ]]; then
+    OUTPUT_PATH=${OUTPUT_PATH}/${INPUT_PATH}
+fi
+
+rsync -avz $INPUT_PATH ${LOGIN}:${OUTPUT_PATH}
+
+# Log to ensure transfer is complete
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+    echo "Transfer of ${INPUT_FILE} failed."
+else
+    echo "Transfer of ${INPUT_FILE} to ${OUTPUT_PATH} succeeded."
+fi

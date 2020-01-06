@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# SGE OPTIONS
+#$ -q short.q
+#$ -S /bin/bash
+#$ -N archiveDir
+
+# ABSOLUTE OR RELATIVE PATHS TO DIRECTORY
+INPUT_PATH=$1
+OUTPUT_PATH=$2
+
+# GET PARENT DIRECTORY OF INPUT_PATH
+PARENT_DIR="$(dirname "$INPUT_PATH")"
+FOLDER_NAME="$(basename "$INPUT_PATH")"
+
+# GO TO PARENT DIRECTORY AND CREATE A TAR FILE
+cd $PARENT_DIR
+tar -zchvf ${OUTPUT_PATH} ${FOLDER_NAME}/
+
+# Check if compression was successful
+if [[ $? -ne 0 ]]; then
+    echo "Archiving of ${INPUT_PATH} failed."
+    exit 1
+else
+    md5sum ${OUTPATH_PATH} > ${OUTPUT_PATH}.md5
+    echo "Archiving of ${INPUT_PATH} complete."
+fi
