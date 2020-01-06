@@ -32,6 +32,8 @@ STATUS=$?
 
 if [ $STATUS -ne 0 ]; then
     echo "Transfer of ${INPUT_FILE} failed."
+    exit 1
 else
     echo "Transfer of ${INPUT_FILE} to ${OUTPUT_PATH} succeeded."
+    exit 0
 fi
