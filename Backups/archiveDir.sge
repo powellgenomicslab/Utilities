@@ -6,6 +6,8 @@
 #$ -N archiveDir
 
 # ABSOLUTE OR RELATIVE PATHS TO DIRECTORY
+# Example running of the script
+# qsub archiveDir.sge /backup/this/folder myArchivedFolder.tar.gz
 INPUT_PATH=$1
 OUTPUT_PATH=$2
 

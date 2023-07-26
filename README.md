@@ -1,2 +1,3 @@
 # Utilities
-A compilation of useful snippets for use on Wolfpack.
+A compilation of useful snippets for use on Brenner.
+

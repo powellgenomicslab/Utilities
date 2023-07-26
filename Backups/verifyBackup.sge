@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# SGE OPTIONS
+#$ -V
+#$ -cwd
+#$ -b n
+#$ -l mem_requested=8G,fast_dm=10
+#$ -q short.q
+#$ -S /bin/bash
+#$ -N nci_checksum
+
+## How to run this file - qsub RemoteChecksum.sge /path/to/your/tarfile_on_NCI.tar.gz
+
+# NCI LOGIN - MAKE SURE YOU CHANGE as8754 TO YOUR NCI USERNAME
+LOGIN=as8574@gadi-dm.nci.org.au
+
+# Files to check on NCI
+TARFILE=$1
+PARENT_DIR="$(dirname "$TARFILE")"
+TAR_FILENAME="$(basename "$TARFILE")"
+MD5_FILE=${TAR_FILENAME}.md5
+
+# Check if the file is actually on NCI
+if ssh $LOGIN "test -e ${TARFILE}"; then
+ssh $LOGIN "cd ${PARENT_DIR}; md5sum -c ${MD5_FILE}";
+else 
+echo "File does not exist";
+fi
