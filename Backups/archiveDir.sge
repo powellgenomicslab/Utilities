@@ -9,21 +9,29 @@
 # Example running of the script
 # qsub archiveDir.sge /backup/this/folder myArchivedFolder.tar.gz
 INPUT_PATH=$1
-OUTPUT_PATH=$2
+TAR_FILE=$2
 
 # GET PARENT DIRECTORY OF INPUT_PATH
 PARENT_DIR="$(dirname "$INPUT_PATH")"
 FOLDER_NAME="$(basename "$INPUT_PATH")"
 
-# GO TO PARENT DIRECTORY AND CREATE A TAR FILE
-cd $PARENT_DIR
-tar -zchvf ${OUTPUT_PATH} ${FOLDER_NAME}/
+# Check if TAR_FILE ends with tar.gz, if not add it.
+[[ "${TAR_FILE}" != *.tar.gz ]] && TAR_FILE="${TAR_FILE}.tar.gz"
 
-# Check if compression was successful
-if [[ $? -ne 0 ]]; then
-    echo "Archiving of ${INPUT_PATH} failed."
-    exit 1
+# If input path is a directory, compress it. Otherwise no.
+if [[ -d $INPUT_DIR ]]
+then
+    # GO TO PARENT DIRECTORY AND CREATE A TAR FILE
+    cd $PARENT_DIR
+    tar -zchvf ${TAR_FILE} ${FOLDER_NAME}/
+    # Check if compression was successful
+    if [[ $? -ne 0 ]]; then
+        echo "Archiving of ${INPUT_PATH} failed."
+        exit 1
+    else
+        md5sum ${TAR_FILE} > ${TAR_FILE}.md5
+        echo "Archiving of ${INPUT_PATH} complete."
+    fi
 else
-    md5sum ${OUTPATH_PATH} > ${OUTPUT_PATH}.md5
-    echo "Archiving of ${INPUT_PATH} complete."
+    echo "${INPUT_PATH} not a directory."
 fi

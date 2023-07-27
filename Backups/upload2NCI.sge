@@ -9,16 +9,17 @@
 #$ -S /bin/bash
 #$ -N nci_backup
 #$ -l tmp_requested=1000G,tmpfree=1000G
-
-# Change as8574 to your NCI account name
-LOGIN="as8574@gadi-dm.nci.org.au"
+#$ -M a.senabouth@garvan.org.au
 
 # INPUT DIRECTORIES
-# So for the command... qsub BackupLarge2NCI.sge /path/to/backup backup_filename /path/on/nci/to/move/to
+# So for the command... qsub BackupLarge2NCI.sge /path/to/backup backup_filename.tar.gz /path/on/nci/to/move/to
 INPUT_DIR=$1
 TAR_FILENAME=$2
 MD5_FILE=${TAR_FILENAME}.md5
 NCI_DIR=$3
+
+## CLEAN UP NCI_DIR so it does not end with a forward slash
+[[ "${NCI_DIR}" == */ ]] && NCI_DIR="${NCI_DIR: : -1}"
 
 # Check if the input variable is actually a directory
 # 1. Go to parent directory of the directory we are backing up
@@ -46,11 +47,12 @@ then
 
     # Once it is complete, transfer to NCI
     # If you are using my script, remember to change to your username and ensure your SSH keys are properly set
-    rsync -avz ${TAR_FILENAME} ${LOGIN}:${NCI_DIR}/${TAR_FILENAME}
-    rsync -avz ${MD5_FILE} ${LOGIN}:${NCI_DIR}/${MD5_FILE}
+    rsync -az --mkpath ${TAR_FILENAME} as8574@gadi-dm.nci.org.au:${NCI_DIR}/${TAR_FILENAME}
+    rsync -az ${MD5_FILE} as8574@gadi-dm.nci.org.au:${NCI_DIR}/${MD5_FILE}
 
     # Run SSH remotely to check the transfer went fine.
-    ssh ${LOGIN} """cd ${NCI_DIR}; md5sum -c ${MD5_FILE}"""
+    ssh as8574@gadi-dm.nci.org.au "cd ${NCI_DIR}; md5sum -c ${MD5_FILE}"
 else
     echo "$INPUT_DIR is not a directory."
 fi
+
