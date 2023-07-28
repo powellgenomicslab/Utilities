@@ -15,7 +15,7 @@
 LOGIN=as8574@gadi-dm.nci.org.au
 
 # INPUT DIRECTORIES
-# So for the command... qsub BackupLarge2NCI.sge /path/to/backup backup_filename.tar.gz /path/on/nci/to/move/to
+# So for the command... qsub upload2NCI.sge /path/to/backup backup_filename.tar.gz /path/on/nci/to/move/to
 INPUT_DIR=$1
 TAR_FILENAME=$2
 MD5_FILE=${TAR_FILENAME}.md5
@@ -48,9 +48,13 @@ then
     md5sum $TAR_FILENAME > $MD5_FILE
     md5sum -c $MD5_FILE
 
+    # Create directory on NCI if it doesn't exist.
+    ssh ${LOGIN} "mkdir -p ${NCI_DIR}"
+    
+    fi
     # Once it is complete, transfer to NCI
     # If you are using my script, remember to change to your username and ensure your SSH keys are properly set
-    rsync -az --mkpath ${TAR_FILENAME} ${LOGIN}:${NCI_DIR}/${TAR_FILENAME}
+    rsync -az ${TAR_FILENAME} ${LOGIN}:${NCI_DIR}/${TAR_FILENAME}
     rsync -az ${MD5_FILE} ${LOGIN}:${NCI_DIR}/${MD5_FILE}
 
     # Run SSH remotely to check the transfer went fine.
