@@ -11,6 +11,9 @@
 #$ -l tmp_requested=1000G,tmpfree=1000G
 #$ -M a.senabouth@garvan.org.au
 
+# Remember to change this to your NCI username
+LOGIN=as8574@gadi-dm.nci.org.au
+
 # INPUT DIRECTORIES
 # So for the command... qsub BackupLarge2NCI.sge /path/to/backup backup_filename.tar.gz /path/on/nci/to/move/to
 INPUT_DIR=$1
@@ -47,12 +50,11 @@ then
 
     # Once it is complete, transfer to NCI
     # If you are using my script, remember to change to your username and ensure your SSH keys are properly set
-    rsync -az --mkpath ${TAR_FILENAME} as8574@gadi-dm.nci.org.au:${NCI_DIR}/${TAR_FILENAME}
-    rsync -az ${MD5_FILE} as8574@gadi-dm.nci.org.au:${NCI_DIR}/${MD5_FILE}
+    rsync -az --mkpath ${TAR_FILENAME} ${LOGIN}:${NCI_DIR}/${TAR_FILENAME}
+    rsync -az ${MD5_FILE} ${LOGIN}:${NCI_DIR}/${MD5_FILE}
 
     # Run SSH remotely to check the transfer went fine.
-    ssh as8574@gadi-dm.nci.org.au "cd ${NCI_DIR}; md5sum -c ${MD5_FILE}"
+    ssh ${LOGIN} "cd ${NCI_DIR}; md5sum -c ${MD5_FILE}"
 else
     echo "$INPUT_DIR is not a directory."
 fi
-

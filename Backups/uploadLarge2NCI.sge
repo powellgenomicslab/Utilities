@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# SGE OPTIONS
+#$ -V
+#$ -cwd
+#$ -b n
+#$ -l mem_requested=8G,fast_dm=10
+#$ -q long.q
+#$ -S /bin/bash
+#$ -N transfer_large
+#$ -M a.senabouth@garvan.org.au
+
+# INPUT DIRECTORIES
+# So for the command... qsub TransferLarge2NCI.sge /path/to/filename.tar.gz /path/on/nci/to/move/to
+FILEPATH=$1
+NCI_DIR=$2
+
+# Remember to change this and the email once you start using it.
+LOGIN=as8574@gadi-dm.nci.org.au
+
+## CLEAN UP NCI_DIR so it does not end with a forward slash
+[[ "${NCI_DIR}" == */ ]] && NCI_DIR="${NCI_DIR: : -1}"
+
+# Check if the input variable is actually a directory
+# 1. Go to parent directory of the directory we are backing up
+# 2. Create an MD5 file of the TAR file
+# 3. Transfer to NCI
+# 4. Run remote checksum to ensure it is fine
+
+# Get paths from input directory
+PARENT_DIR="$(dirname "$FILEPATH")"
+FILENAME="$(basename "$FILENAME")"
+MD5_FILE=${FILENAME}.md5
+
+# Navigate to parent directory
+cd $PARENT_DIR
+md5sum $FILENAME > $MD5_FILE
+md5sum -c $MD5_FILE
+
+# Once it is complete, transfer to NCI
+# If you are using my script, remember to change to your username and ensure your SSH keys are properly set
+rsync -az --mkpath ${FILENAME} ${LOGIN}:${NCI_DIR}/${FILENAME}
+rsync -az ${MD5_FILE} ${LOGIN}:${NCI_DIR}/${MD5_FILE}
+
+# Run SSH remotely to check the transfer went fine.
+ssh ${LOGIN} "cd ${NCI_DIR}; md5sum -c ${MD5_FILE}"
