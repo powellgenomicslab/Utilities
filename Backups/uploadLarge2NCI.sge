@@ -5,7 +5,7 @@
 #$ -cwd
 #$ -b n
 #$ -l mem_requested=8G,fast_dm=10
-#$ -q long.q
+#$ -q short.q
 #$ -S /bin/bash
 #$ -N transfer_large
 #$ -M a.senabouth@garvan.org.au
@@ -29,17 +29,26 @@ LOGIN=as8574@gadi-dm.nci.org.au
 
 # Get paths from input directory
 PARENT_DIR="$(dirname "$FILEPATH")"
-FILENAME="$(basename "$FILENAME")"
+FILENAME="$(basename "$FILEPATH")"
 MD5_FILE=${FILENAME}.md5
 
 # Navigate to parent directory
 cd $PARENT_DIR
-md5sum $FILENAME > $MD5_FILE
-md5sum -c $MD5_FILE
 
-# Once it is complete, transfer to NCI
+# If checksum not present, create one
+# Run checksum before transfer to ensure it is fine
+if [[ ! -f "$MD5_FILE" ]]
+then
+    md5sum $FILENAME > $MD5_FILE
+    md5sum -c $MD5_FILE
+fi
+
+## Create directory on NCI if it doesn't exist
+ssh ${LOGIN} "mkdir -p ${NCI_DIR}"
+
+# Transfer to NCI
 # If you are using my script, remember to change to your username and ensure your SSH keys are properly set
-rsync -az --mkpath ${FILENAME} ${LOGIN}:${NCI_DIR}/${FILENAME}
+rsync -az ${FILENAME} ${LOGIN}:${NCI_DIR}/${FILENAME}
 rsync -az ${MD5_FILE} ${LOGIN}:${NCI_DIR}/${MD5_FILE}
 
 # Run SSH remotely to check the transfer went fine.
