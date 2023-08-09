@@ -8,6 +8,8 @@
 #$ -q short.q
 #$ -S /bin/bash
 #$ -N nci_checksum
+#$ -M a.senabouth@garvan.org.au
+#$ -m ae
 
 ## How to run this file - qsub RemoteChecksum.sge /path/to/your/tarfile_on_NCI.tar.gz
 

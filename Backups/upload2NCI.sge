@@ -10,6 +10,7 @@
 #$ -N nci_backup
 #$ -l tmp_requested=1000G,tmpfree=1000G
 #$ -M a.senabouth@garvan.org.au
+#$ -m ae
 
 # Remember to change this to your NCI username
 LOGIN=as8574@gadi-dm.nci.org.au

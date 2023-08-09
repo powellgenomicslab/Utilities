@@ -4,6 +4,8 @@
 #$ -q short.q
 #$ -S /bin/bash
 #$ -N archiveDir
+#$ -M a.senabouth@garvan.org.au
+#$ -m ae
 
 # ABSOLUTE OR RELATIVE PATHS TO DIRECTORY
 # Example running of the script

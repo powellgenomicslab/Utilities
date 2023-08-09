@@ -9,6 +9,7 @@
 #$ -S /bin/bash
 #$ -N transfer_large
 #$ -M a.senabouth@garvan.org.au
+#$ -m ae
 
 # INPUT DIRECTORIES
 # So for the command... qsub TransferLarge2NCI.sge /path/to/filename.tar.gz /path/on/nci/to/move/to
